@@ -1,0 +1,53 @@
+{
+  "name": "quizrush",
+  "version": "1.0.0",
+  "private": true,
+  "proxy": "http://localhost:5000",
+  "dependencies": {
+    "ajv": "8.12.0",
+    "ajv-keywords": "5.1.0",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "firebase": "^11.6.1",
+    "framer-motion": "^12.16.0",
+    "i18next": "^25.2.1",
+    "i18next-browser-languagedetector": "^8.1.0",
+    "lucide-react": "^0.513.0",
+    "openai": "^4.97.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^15.5.2",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.5.3",
+    "react-scripts": "^5.0.1",
+    "recharts": "^2.15.3"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^4.9.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
