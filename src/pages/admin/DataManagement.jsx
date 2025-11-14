@@ -1,5 +1,13 @@
+/* --------------------------------------------------------------------------
+   DataManagement.jsx – vivid-blue Admin Dashboard (with shared Top Nav)
+   --------------------------------------------------------------------------*/
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
+
 import AdminSidebar from "../../components/AdminSidebar";
+import AdminTopNavBar from "../../components/AdminTopNavBar";
+
 import {
   Building2,
   BookOpen,
@@ -7,92 +15,149 @@ import {
   GraduationCap,
   FileText,
   UserRound,
-  FileCheck,
+  ChevronRight,
 } from "lucide-react";
 
-const managementItems = [
+/* ───────────────────────────────── Management Modules ───────────────────────────────── */
+const managementModules = [
   {
+    id: "departments",
     title: "Departments",
-    icon: <Building2 className="w-6 h-6 text-[#974EC3]" />,
-    description: "Manage academic departments",
+    icon: Building2,
+    description: "Manage academic departments and organizational structure",
+    path: "/admin/departments",
   },
   {
+    id: "courses",
     title: "Courses",
-    icon: <BookOpen className="w-6 h-6 text-[#974EC3]" />,
-    description: "Create or update courses",
+    icon: BookOpen,
+    description: "Create and manage course curriculum",
+    path: "/admin/courses",
   },
   {
+    id: "classes",
     title: "Classes",
-    icon: <Users className="w-6 h-6 text-[#974EC3]" />,
-    description: "Organize student classes",
+    icon: Users,
+    description: "Organize and schedule student classes",
+    path: "/admin/classes",
   },
   {
+    id: "lecturers",
     title: "Lecturers",
-    icon: <UserRound className="w-6 h-6 text-[#974EC3]" />,
-    description: "Manage lecturer profiles",
+    icon: UserRound,
+    description: "Manage lecturer accounts and assignments",
+    path: "/admin/lecturers",
   },
   {
+    id: "students",
     title: "Students",
-    icon: <GraduationCap className="w-6 h-6 text-[#974EC3]" />,
-    description: "Add or edit student records",
+    icon: GraduationCap,
+    description: "Manage student enrollments and profiles",
+    path: "/admin/students",
   },
   {
-    title: "Questions",
-    icon: <FileText className="w-6 h-6 text-[#974EC3]" />,
-    description: "View and manage quiz questions",
-  },
-  {
-    title: "Results",
-    icon: <FileCheck className="w-6 h-6 text-[#974EC3]" />,
-    description: "Monitor quiz results and scores",
+    id: "questions",
+    title: "Quiz Bank",
+    icon: FileText,
+    description: "Manage quiz questions and question pools",
+    path: "/admin/questions",
   },
 ];
 
-const DataManagement = () => {
-  const [sidebarMinimized, setSidebarMinimized] = useState(false);
+/* ─────────────────────────────────── Component ─────────────────────────────────── */
+export default function DataManagement() {
+  const [sidebarMinimized, setSidebarMinimized] = useState(
+    () => localStorage.getItem("sidebarMinimized") === "true",
+  );
 
+  const navigate = useNavigate();
+  const auth = getAuth();
+
+  /* ─────────────── Handlers ─────────────── */
+  const handleProfile = () => navigate("/profile");
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
+  const handleModuleClick = (path) => navigate(path);
+
+  /* ─────────────── Layout helpers ─────────────── */
+  const mainMargin = sidebarMinimized ? "ml-[72px]" : "ml-[240px]";
+
+  /* ─────────────── Render ─────────────── */
   return (
-    <div className="flex min-h-screen bg-[#F6EFFC] text-[#5C517B]">
+    <div className="flex h-screen bg-gradient-to-b from-[#E8F6FF] to-[#D9F0FF] text-[#333333]">
+      {/* Sidebar */}
       <AdminSidebar
         minimized={sidebarMinimized}
-        setSidebarMinimized={setSidebarMinimized}
+        setSidebarMinimized={(val) => {
+          localStorage.setItem("sidebarMinimized", val);
+          setSidebarMinimized(val);
+        }}
       />
 
+      {/* Main Region */}
       <div
-        className={`transition-all duration-300 ease-in-out flex-1 p-8 ${
-          sidebarMinimized ? "pl-[72px]" : "pl-[240px]"
-        }`}
+        className={`flex-1 overflow-y-auto transition-all duration-300 ${mainMargin}`}
       >
-        <h1 className="text-3xl font-extrabold tracking-tight text-[#B76EF1] mb-8">
-          ⚡ <span className="text-[#5C517B]">Data Management</span>
-        </h1>
+        {/* Shared Top Navigation Bar */}
+        <AdminTopNavBar
+          sidebarMinimized={sidebarMinimized}
+          setSidebarMinimized={(val) => {
+            localStorage.setItem("sidebarMinimized", val);
+            setSidebarMinimized(val);
+          }}
+          onProfileClick={handleProfile}
+          onLogoutClick={handleLogout}
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {managementItems.map((item, index) => (
-            <div
-              key={index}
-              className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-2xl transition border border-[#EBD3FA]"
-            >
-              <div className="flex items-start gap-5">
-                <div className="p-3 bg-[#F6EFFC] rounded-full mt-1">
-                  {item.icon}
-                </div>
-                <div className="pl-1">
-                  <h2 className="text-lg font-semibold text-[#5C517B] mb-1">
-                    {item.title}
+        {/* Page Content */}
+        <main className="pt-20 pb-10 px-6 max-w-7xl mx-auto">
+          {/* Heading */}
+          <section className="mb-8">
+            <h1 className="text-2xl font-bold text-[#2A2A2A] mb-1">
+              Data Management
+            </h1>
+            <p className="text-[#333333]/70">
+              Centralized control of QuizRush academic data
+            </p>
+          </section>
+
+          {/* Management Module Cards */}
+          <section className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
+            {managementModules.map(
+              ({ id, title, icon: Icon, description, path }) => (
+                <button
+                  key={id}
+                  onClick={() => handleModuleClick(path)}
+                  aria-label={`Manage ${title}`}
+                  className="group text-left bg-white border border-[#DDDDDD] rounded-xl p-6 shadow-sm hover:shadow-md hover:border-[#3399FF] transition-all"
+                >
+                  {/* Icon + Chevron */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="p-3 rounded-xl bg-[#F3F8FC] group-hover:bg-[#3399FF] transition-colors">
+                      <Icon className="w-6 h-6 text-[#3399FF] group-hover:text-white transition-colors" />
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-[#DDDDDD] group-hover:text-[#3399FF] transition-colors" />
+                  </div>
+
+                  {/* Title & Description */}
+                  <h2 className="text-lg font-semibold text-[#2A2A2A] mb-1 group-hover:text-[#3399FF] transition-colors">
+                    {title}
                   </h2>
-                  <p className="text-sm text-[#5C517B]">{item.description}</p>
-                </div>
-              </div>
-              <button className="mt-6 py-3 w-full font-semibold rounded-lg shadow transition bg-[#B76EF1] hover:bg-[#974EC3] text-white">
-                Manage {item.title}
-              </button>
-            </div>
-          ))}
-        </div>
+                  <p className="text-sm text-[#333333]/70 leading-relaxed">
+                    {description}
+                  </p>
+                </button>
+              ),
+            )}
+          </section>
+        </main>
       </div>
     </div>
   );
-};
-
-export default DataManagement;
+}

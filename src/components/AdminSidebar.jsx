@@ -1,156 +1,216 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+// src/components/AdminSidebar.jsx
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Home,
-  FolderCog,
-  Link2,
   FileText,
   BarChart3,
   Users,
-  Settings,
-  LogOut,
-} from 'lucide-react';
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
+/**
+ * AdminSidebar.jsx – Production-ready vivid-blue design
+ * ------------------------------------------------------
+ * Colors:
+ *  • Sidebar bg:        #F3F8FC
+ *  • Primary accent:    #3399FF | Hover #2785E3
+ *  • Active bg:         #E8F6FF
+ *  • Text primary:      #333333
+ *  • Text muted:        #6B7280
+ *  • Borders:           #E5E7EB
+ */
 export default function AdminSidebar({ minimized, setSidebarMinimized }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [adminName, setAdminName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  /* Auth listener */
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setAdminName(user.displayName || user.email || "Administrator");
+      } else {
+        setAdminName("Administrator");
+      }
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const isActive = (path) => location.pathname === path;
 
   const navSections = [
     {
-      title: 'Main Menu',
+      title: "Main Menu",
       buttons: [
-        {
-          label: 'Dashboard',
-          icon: <Home size={20} />,
-          path: '/admin-dashboard',
-        },
-        {
-          label: 'Data Management',
-          icon: <FolderCog size={20} />,
-          path: '/admin-dashboard/data-management',
-        },
-        {
-          label: 'Entity Links',
-          icon: <Link2 size={20} />,
-          path: '/admin-dashboard/entity-links',
-        },
-        {
-          label: 'Question Bank',
-          icon: <FileText size={20} />,
-          path: '/admin-dashboard/question-bank',
-        },
+        { label: "Dashboard", icon: Home, path: "/admin-dashboard" },
+        { label: "Question Bank", icon: FileText, path: "/admin-dashboard/question-bank" },
       ],
     },
     {
-      title: 'Reports',
+      title: "Reports",
       buttons: [
-        {
-          label: 'Exam Results',
-          icon: <BarChart3 size={20} />,
-          path: '/admin-dashboard/exam-results',
-        },
+        { label: "Reports", icon: BarChart3, path: "/admin-dashboard/reports" },
       ],
     },
     {
-      title: 'Administrator',
+      title: "Administrator",
       buttons: [
-        {
-          label: 'User Management',
-          icon: <Users size={20} />,
-          path: '/admin-dashboard/user-management',
-        },
-        {
-          label: 'Settings',
-          icon: <Settings size={20} />,
-          path: '/admin-dashboard/settings',
-        },
+        { label: "User Management", icon: Users, path: "/admin-dashboard/user-management" },
+        { label: "Activity Log", icon: Clock, path: "/admin-dashboard/activity-log" },
       ],
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate('/login');
-  };
-
-  const handleToggleSidebar = () => {
-    if (typeof setSidebarMinimized === 'function') {
+  const toggleSidebar = () => {
+    if (typeof setSidebarMinimized === "function") {
       setSidebarMinimized((prev) => !prev);
     }
   };
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen z-50 transition-all duration-300 ${
-        minimized ? 'w-[72px]' : 'w-[240px]'
-      } bg-white border-r border-gray-200 shadow-md flex flex-col justify-between`}
+      className={`
+        fixed top-0 left-0 z-50 flex h-screen flex-col
+        border-r border-[#E5E7EB] bg-[#F3F8FC] shadow-lg transition-all duration-300 ease-in-out
+        ${minimized ? "w-[70px]" : "w-[260px]"}
+      `}
     >
-      {/* Top Section */}
-      <div className="p-3">
-        {/* Collapse/Expand Button */}
-        <button
-          onClick={handleToggleSidebar}
-          className="w-9 h-9 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center justify-center mb-4 transition-transform"
-          title={minimized ? 'Expand Sidebar' : 'Collapse Sidebar'}
-        >
-          {minimized ? <span className="font-bold">›</span> : <span className="font-bold">‹</span>}
-        </button>
-
-        {/* Admin Info */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-xl shadow-md">
-            👑
-          </div>
-          {!minimized && (
-            <div className="mt-2 text-center">
-              <p className="text-xs text-gray-500">Administrator</p>
-              <p className="text-sm font-semibold text-gray-700">admin@mail.com</p>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation Sections */}
-        {navSections.map((section, i) => (
-          <div key={i} className="mb-3">
-            {!minimized && (
-              <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
-                {section.title}
-              </p>
+      {/* Main content wrapper with scroll */}
+      <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        <div className="p-4">
+          {/* Toggle button */}
+          <button
+            onClick={toggleSidebar}
+            aria-label={minimized ? "Expand sidebar" : "Collapse sidebar"}
+            className="
+              mb-5 flex h-10 w-10 items-center justify-center rounded-lg
+              bg-white text-[#3399FF] shadow-sm transition-all duration-200
+              hover:bg-[#3399FF] hover:text-white hover:shadow-md
+              focus:outline-none focus:ring-2 focus:ring-[#3399FF] focus:ring-offset-2
+            "
+          >
+            {minimized ? (
+              <ChevronRight size={20} strokeWidth={2.5} />
+            ) : (
+              <ChevronLeft size={20} strokeWidth={2.5} />
             )}
-            {section.buttons.map((btn, j) => (
-              <button
-                key={j}
-                onClick={() => navigate(btn.path)}
-                className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm transition-all
-                  ${
-                    isActive(btn.path)
-                      ? 'bg-purple-100 text-purple-700 font-semibold border-l-4 border-purple-500'
-                      : 'hover:bg-gray-100 text-gray-700'
-                  }
-                  ${minimized ? 'justify-center' : ''}`}
-                title={minimized ? btn.label : undefined}
-              >
-                {btn.icon}
-                {!minimized && <span>{btn.label}</span>}
-              </button>
-            ))}
+          </button>
+
+          {/* Profile section */}
+          <div
+            onClick={() => navigate("/admin-dashboard/settings")}
+            className={`
+              mb-6 cursor-pointer rounded-xl bg-white p-3 shadow-sm
+              transition-all duration-200 hover:shadow-md hover:scale-[1.02]
+              ${minimized ? "flex justify-center" : ""}
+            `}
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#3399FF] to-[#2785E3] text-xl shadow-sm">
+                👑
+              </div>
+              {!minimized && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-[#6B7280]">
+                    Administrator
+                  </p>
+                  <p className="truncate text-sm font-semibold text-[#333333]">
+                    {isLoading ? "Loading..." : adminName}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        ))}
+
+          {/* Navigation sections */}
+          <nav className="space-y-6">
+            {navSections.map((section, idx) => (
+              <div key={idx}>
+                {!minimized && (
+                  <h3 className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#6B7280]">
+                    {section.title}
+                  </h3>
+                )}
+                <div className="space-y-1">
+                  {section.buttons.map((btn) => {
+                    const Icon = btn.icon;
+                    const active = isActive(btn.path);
+
+                    return (
+                      <button
+                        key={btn.path}
+                        onClick={() => navigate(btn.path)}
+                        title={minimized ? btn.label : undefined}
+                        className={`
+                          group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5
+                          text-sm font-medium transition-all duration-200
+                          ${minimized ? "justify-center" : ""}
+                          ${
+                            active
+                              ? "bg-[#E8F6FF] text-[#3399FF] shadow-sm"
+                              : "text-[#333333] hover:bg-white hover:shadow-sm"
+                          }
+                        `}
+                      >
+                        {/* Active indicator */}
+                        {active && !minimized && (
+                          <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-[#3399FF]" />
+                        )}
+
+                        {/* Icon */}
+                        <Icon
+                          size={20}
+                          className={`
+                            flex-shrink-0 transition-transform duration-200
+                            ${active ? "scale-110" : "group-hover:scale-105"}
+                          `}
+                          strokeWidth={active ? 2.5 : 2}
+                        />
+
+                        {/* Label */}
+                        {!minimized && (
+                          <span className="truncate">{btn.label}</span>
+                        )}
+
+                        {/* Tooltip for minimized state */}
+                        {minimized && (
+                          <div className="
+                            pointer-events-none absolute left-full ml-2 rounded-md
+                            bg-[#333333] px-3 py-1.5 text-xs font-medium text-white
+                            opacity-0 shadow-lg transition-opacity duration-200
+                            group-hover:opacity-100 whitespace-nowrap z-50
+                          ">
+                            {btn.label}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </nav>
+        </div>
       </div>
 
-      {/* Logout */}
-      <div className="p-3">
-        <button
-          onClick={handleLogout}
-          className={`flex items-center gap-3 w-full px-3 py-2 rounded-md bg-red-500 hover:bg-red-600 text-sm font-medium text-white
-            ${minimized ? 'justify-center' : 'justify-start'}`}
-        >
-          <LogOut size={20} />
-          {!minimized && <span>Log Out</span>}
-        </button>
-      </div>
+      {/* Footer branding */}
+      {!minimized && (
+        <div className="border-t border-[#E5E7EB] bg-white p-4">
+          <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+            <div className="flex h-6 w-6 items-center justify-center rounded bg-[#F3F8FC] text-[#3399FF]">
+              ✨
+            </div>
+            <span className="font-medium">QuizRush</span>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

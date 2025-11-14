@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from './axiosConfig';
 
 function QuizGenerator() {
   const [inputText, setInputText] = useState('');
@@ -7,7 +7,7 @@ function QuizGenerator() {
 
   const handleGenerateQuiz = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/generate-quiz', {
+      const response = await axios.post('/api/generate-quiz', {
         text: inputText,
       });
 
